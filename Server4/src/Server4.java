@@ -114,7 +114,16 @@ class ClientHandler implements Runnable {
 	
 	do {
 	    try {
-		str = instream.readLine();           // wait for client to send data   
+		str = instream.readLine();           // wait for client to send data
+		// str will be NULL if client terminates. Stop gracefully instead of
+		// crashing the thread.
+		if (str == null) {
+			System.out.println(
+				"Client suddenly disconnected on socket " + conn.toString()
+			);
+			this.stop();
+			return;
+		}
 		outstream.write("You said " + str);  // send a reply to client
 		outstream.newLine();
 		outstream.flush();
